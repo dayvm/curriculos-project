@@ -6,6 +6,8 @@ import { curriculoRoutes } from "./modules/curriculos/curriculo.routes.js";
 import { experienciaAcademicaRoutes } from "./modules/experiencias-academicas/experiencia-academica.routes.js";
 import { experienciaProfissionalRoutes } from "./modules/experiencias-profissionais/experiencia-profissional.routes.js";
 import { projetoRoutes } from "./modules/projetos/projeto.routes.js";
+import { tecnologiaRoutes } from "./modules/tecnologias/tecnologia.routes.js";
+import { relacionamentoRoutes } from "./modules/relacionamentos/relacionamento.routes.js";
 import { AppError } from "./shared/errors/AppError.js";
 import { ErrorCode } from "./shared/errors/error-code.js";
 import { errorHandlerMiddleware } from "./shared/middlewares/error.middleware.js";
@@ -29,6 +31,8 @@ app.use("/curriculos", curriculoRoutes);
 app.use(experienciaAcademicaRoutes);
 app.use(experienciaProfissionalRoutes);
 app.use(projetoRoutes);
+app.use(tecnologiaRoutes);
+app.use(relacionamentoRoutes);
 
 app.use((_req, _res, next) => {
   next(
