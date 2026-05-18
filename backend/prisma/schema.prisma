@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// -------------------------
+// Enums
+// -------------------------
+
+enum StatusCurriculo {
+  ATIVO
+  INATIVO
+}
+
+enum TipoProjeto {
+  PROFISSIONAL
+  ACADEMICO
+  INDIVIDUAL
+}
+
+enum CategoriaTecnologia {
+  LINGUAGEM
+  FRAMEWORK
+  BIBLIOTECA
+  BANCO_DE_DADOS
+  ORM
+  FERRAMENTA
+  PLATAFORMA
+  SERVICO
+  METODOLOGIA
+  OUTRA
+}
+
+// -------------------------
+// Entidade principal
+// -------------------------
+
+model Curriculo {
+  id       String           @id @default(uuid()) @db.Uuid
+  nome     String           @db.VarChar(120)
+  titulo   String           @db.VarChar(160)
+  resumo   String           @db.Text
+  email    String           @unique @db.VarChar(180)
+  telefone String?          @db.VarChar(30)
+  fotoUrl  String?          @map("foto_url") @db.Text
+  status   StatusCurriculo  @default(ATIVO)
+
+  experienciasAcademicas    ExperienciaAcademica[]
+  experienciasProfissionais ExperienciaProfissional[]
+  projetos                  Projeto[]
+  tecnologias               CurriculoTecnologia[]
+
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@map("curriculos")
+}
+
+// -------------------------
+// Experiências acadêmicas
+// -------------------------
+
+model ExperienciaAcademica {
+  id          String    @id @default(uuid()) @db.Uuid
+  curriculoId String   @map("curriculo_id") @db.Uuid
+
+  instituicao String   @db.VarChar(180)
+  curso       String   @db.VarChar(180)
+  dataInicio  DateTime @map("data_inicio") @db.Date
+  dataFim     DateTime? @map("data_fim") @db.Date
+
+  curriculo Curriculo @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
+
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@index([curriculoId])
+  @@map("experiencias_academicas")
+}
+
+// -------------------------
+// Experiências profissionais
+// -------------------------
+
+model ExperienciaProfissional {
+  id          String    @id @default(uuid()) @db.Uuid
+  curriculoId String   @map("curriculo_id") @db.Uuid
+
+  empresa    String    @db.VarChar(180)
+  cargo      String    @db.VarChar(180)
+  dataInicio DateTime  @map("data_inicio") @db.Date
+  dataFim    DateTime? @map("data_fim") @db.Date
+
+  curriculo Curriculo @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
+
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@index([curriculoId])
+  @@map("experiencias_profissionais")
+}
+
+// -------------------------
+// Projetos
+// -------------------------
+
+model Projeto {
+  id          String      @id @default(uuid()) @db.Uuid
+  curriculoId String     @map("curriculo_id") @db.Uuid
+
+  slug           String      @unique @db.VarChar(140)
+  titulo         String      @db.VarChar(180)
+  descricaoCurta String      @map("descricao_curta") @db.VarChar(280)
+  descricaoLonga String      @map("descricao_longa") @db.Text
+  imagemUrl      String?     @map("imagem_url") @db.Text
+  githubUrl      String?     @map("github_url") @db.Text
+  demoUrl        String?     @map("demo_url") @db.Text
+  tipo           TipoProjeto
+  instituicao    String?     @db.VarChar(180)
+
+  curriculo   Curriculo             @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
+  tecnologias ProjetoTecnologia[]
+
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@index([curriculoId])
+  @@index([tipo])
+  @@map("projetos")
+}
+
+// -------------------------
+// Tecnologias / habilidades
+// -------------------------
+
+model Tecnologia {
+  id        String               @id @default(uuid()) @db.Uuid
+  nome      String               @unique @db.VarChar(100)
+  descricao String?              @db.Text
+  categoria CategoriaTecnologia  @default(OUTRA)
+
+  curriculos CurriculoTecnologia[]
+  projetos   ProjetoTecnologia[]
+
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  @@map("tecnologias")
+}
+
+// -------------------------
+// Relação N:N Currículo <-> Tecnologia
+// -------------------------
+
+model CurriculoTecnologia {
+  curriculoId  String @map("curriculo_id") @db.Uuid
+  tecnologiaId String @map("tecnologia_id") @db.Uuid
+
+  curriculo  Curriculo  @relation(fields: [curriculoId], references: [id], onDelete: Cascade)
+  tecnologia Tecnologia @relation(fields: [tecnologiaId], references: [id], onDelete: Cascade)
+
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  @@id([curriculoId, tecnologiaId])
+  @@index([tecnologiaId])
+  @@map("curriculos_tecnologias")
+}
+
+// -------------------------
+// Relação N:N Projeto <-> Tecnologia
+// -------------------------
+
+model ProjetoTecnologia {
+  projetoId    String @map("projeto_id") @db.Uuid
+  tecnologiaId String @map("tecnologia_id") @db.Uuid
+
+  projeto    Projeto    @relation(fields: [projetoId], references: [id], onDelete: Cascade)
+  tecnologia Tecnologia @relation(fields: [tecnologiaId], references: [id], onDelete: Cascade)
+
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  @@id([projetoId, tecnologiaId])
+  @@index([tecnologiaId])
+  @@map("projetos_tecnologias")
+}
