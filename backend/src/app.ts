@@ -12,7 +12,10 @@ import { AppError } from "./shared/errors/AppError.js";
 import { ErrorCode } from "./shared/errors/error-code.js";
 import { errorHandlerMiddleware } from "./shared/middlewares/error.middleware.js";
 
-export const app = express();
+const app = express();
+
+export { app };
+export default app;
 
 app.use(helmet());
 app.use(cors());
