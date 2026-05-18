@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { curriculoRoutes } from "./modules/curriculos/curriculo.routes.js";
 import { experienciaAcademicaRoutes } from "./modules/experiencias-academicas/experiencia-academica.routes.js";
 import { experienciaProfissionalRoutes } from "./modules/experiencias-profissionais/experiencia-profissional.routes.js";
+import { projetoRoutes } from "./modules/projetos/projeto.routes.js";
 import { AppError } from "./shared/errors/AppError.js";
 import { ErrorCode } from "./shared/errors/error-code.js";
 import { errorHandlerMiddleware } from "./shared/middlewares/error.middleware.js";
@@ -27,6 +28,7 @@ app.get("/health", (_req, res) => {
 app.use("/curriculos", curriculoRoutes);
 app.use(experienciaAcademicaRoutes);
 app.use(experienciaProfissionalRoutes);
+app.use(projetoRoutes);
 
 app.use((_req, _res, next) => {
   next(
