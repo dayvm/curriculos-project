@@ -4,6 +4,7 @@ import { View } from "react-native";
 
 import { CurriculoHeader } from "@/components/domain/curriculo-header";
 import { ScreenContainer } from "@/components/layout/screen-container";
+import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ErrorState } from "@/components/ui/error-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -66,13 +67,22 @@ export default function CurriculoDetailPage() {
             </Text>
           </View>
 
-          <View className="pt-2">
-            <Text
-              className="text-destructive text-sm font-medium"
+          <View className="flex-row gap-3 pt-2">
+            <Button
+              className="flex-1"
+              variant="outline"
+              onPress={() => router.push(routes.curriculoEditar(curriculoId))}
+            >
+              <Text>Editar</Text>
+            </Button>
+
+            <Button
+              className="flex-1"
+              variant="destructive"
               onPress={() => setOpenDeleteDialog(true)}
             >
-              Excluir curriculo
-            </Text>
+              <Text>Excluir</Text>
+            </Button>
           </View>
         </View>
       ) : null}

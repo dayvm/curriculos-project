@@ -3,6 +3,7 @@ import { View } from "react-native";
 
 import { CurriculoCard } from "@/components/domain/curriculo-card";
 import { ScreenContainer } from "@/components/layout/screen-container";
+import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { LoadingState } from "@/components/ui/loading-state";
@@ -30,11 +31,17 @@ export default function HomeTab() {
   return (
     <ScreenContainer>
       <View className="gap-5">
-        <View className="gap-1">
-          <Text className="text-2xl font-semibold">Curriculos</Text>
-          <Text className="text-muted-foreground">
-            Selecione um curriculo para ver os detalhes.
-          </Text>
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="flex-1 gap-1">
+            <Text className="text-2xl font-semibold">Curriculos</Text>
+            <Text className="text-muted-foreground">
+              Selecione um curriculo para ver os detalhes.
+            </Text>
+          </View>
+
+          <Button onPress={() => router.push(routes.curriculoNovo)}>
+            <Text>Novo</Text>
+          </Button>
         </View>
 
         {isPending ? <LoadingState label="Carregando curriculos..." /> : null}
@@ -62,6 +69,7 @@ export default function HomeTab() {
                 curriculo={curriculo}
                 isSelected={selectedCurriculoId === curriculo.id}
                 onPress={() => handleOpenCurriculo(curriculo.id)}
+                onEdit={() => router.push(routes.curriculoEditar(curriculo.id))}
               />
             ))}
           </View>
