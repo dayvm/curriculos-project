@@ -5,4 +5,6 @@ export const routes = {
   curriculoDetail: (id: string) => `/curriculos/${id}`,
   curriculoEditar: (id: string) => `/curriculos/${id}/editar`,
   curriculoAnotacao: (id: string) => `/curriculos/${id}/anotacao`,
+  curriculoProjetoDetail: (curriculoId: string, projetoId: string) =>
+  `/curriculos/${curriculoId}/projetos/${projetoId}`,
 };

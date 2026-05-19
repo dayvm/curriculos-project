@@ -65,7 +65,18 @@ export default function ProjetosTab() {
         {!isPending && !isError && data?.length ? (
           <View className="gap-4">
             {data.map((projeto) => (
-              <ProjetoCard key={projeto.id} projeto={projeto} />
+              <ProjetoCard
+                key={projeto.id}
+                projeto={projeto}
+                onPress={() =>
+                  router.push(
+                    routes.curriculoProjetoDetail(
+                      selectedCurriculoId,
+                      projeto.id,
+                    ),
+                  )
+                }
+              />
             ))}
           </View>
         ) : null}
