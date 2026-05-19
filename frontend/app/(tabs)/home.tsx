@@ -1,69 +1,72 @@
-import { useState } from "react";
+import { useRouter } from "expo-router";
 import { View } from "react-native";
 
+import { CurriculoCard } from "@/components/domain/curriculo-card";
 import { ScreenContainer } from "@/components/layout/screen-container";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
-import { Input } from "@/components/ui/input";
 import { LoadingState } from "@/components/ui/loading-state";
 import { Text } from "@/components/ui/text";
+import { useCurriculos } from "@/features/curriculos/hooks/use-curriculos";
+import { routes } from "@/lib/constants/routes";
+import { normalizeError } from "@/lib/utils/normalize-error";
+import { useCurriculoStore } from "@/store/curriculo.store";
 
 export default function HomeTab() {
-  const [nome, setNome] = useState("");
-  const [openConfirm, setOpenConfirm] = useState(false);
+  const router = useRouter();
+  const { data, isPending, isError, error, refetch } = useCurriculos();
+  const selectedCurriculoId = useCurriculoStore(
+    (state) => state.selectedCurriculoId,
+  );
+  const setSelectedCurriculoId = useCurriculoStore(
+    (state) => state.setSelectedCurriculoId,
+  );
+
+  function handleOpenCurriculo(curriculoId: string) {
+    setSelectedCurriculoId(curriculoId);
+    router.push(routes.curriculoDetail(curriculoId));
+  }
 
   return (
     <ScreenContainer>
-      <View className="gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Teste de componentes</CardTitle>
-          </CardHeader>
+      <View className="gap-5">
+        <View className="gap-1">
+          <Text className="text-2xl font-semibold">Curriculos</Text>
+          <Text className="text-muted-foreground">
+            Selecione um curriculo para ver os detalhes.
+          </Text>
+        </View>
 
-          <CardContent className="gap-4">
-            <Input
-              placeholder="Digite seu nome"
-              value={nome}
-              onChangeText={setNome}
-            />
+        {isPending ? <LoadingState label="Carregando curriculos..." /> : null}
 
-            <Button onPress={() => setOpenConfirm(true)}>
-              <Text>Abrir confirm dialog</Text>
-            </Button>
-          </CardContent>
-        </Card>
+        {isError ? (
+          <ErrorState
+            title="Erro ao carregar curriculos"
+            message={normalizeError(error)}
+            onRetry={() => refetch()}
+          />
+        ) : null}
 
-        <LoadingState />
+        {!isPending && !isError && !data?.length ? (
+          <EmptyState
+            title="Nenhum curriculo encontrado"
+            description="Sua API nao retornou curriculos no momento."
+          />
+        ) : null}
 
-        <ErrorState
-          title="Erro de teste"
-          message="Isso aqui eh apenas validacao visual."
-          onRetry={() => console.log("retry")}
-        />
-
-        <EmptyState
-          title="Lista vazia"
-          description="Ainda nao existe nenhum item cadastrado."
-          actionLabel="Criar item"
-          onAction={() => console.log("criar")}
-        />
+        {!isPending && !isError && data?.length ? (
+          <View className="gap-4">
+            {data.map((curriculo) => (
+              <CurriculoCard
+                key={curriculo.id}
+                curriculo={curriculo}
+                isSelected={selectedCurriculoId === curriculo.id}
+                onPress={() => handleOpenCurriculo(curriculo.id)}
+              />
+            ))}
+          </View>
+        ) : null}
       </View>
-
-      <ConfirmDialog
-        open={openConfirm}
-        onOpenChange={setOpenConfirm}
-        title="Confirmar acao"
-        description={`Nome digitado: ${nome || "vazio"}`}
-        confirmLabel="Confirmar"
-        cancelLabel="Cancelar"
-        onConfirm={() => {
-          console.log("confirmado");
-          setOpenConfirm(false);
-        }}
-      />
     </ScreenContainer>
   );
 }
