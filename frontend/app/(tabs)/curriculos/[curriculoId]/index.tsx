@@ -78,6 +78,14 @@ export default function CurriculoDetailPage() {
 
             <Button
               className="flex-1"
+              variant="outline"
+              onPress={() => router.push(routes.curriculoAnotacao(curriculoId))}
+            >
+              <Text>Anotacao</Text>
+            </Button>
+
+            <Button
+              className="flex-1"
               variant="destructive"
               onPress={() => setOpenDeleteDialog(true)}
             >
